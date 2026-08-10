@@ -1,42 +1,26 @@
-# causal-inference-from-scratch
+# Causal inference from scratch
 
-A technical-test repository for learning causal inference by implementing the estimators rather than hiding behind package syntax.
+A package call can return a coefficient without making the comparison, weighting, or variance calculation obvious. I wrote small versions of common estimators so I could trace those steps and deliberately break their assumptions.
 
-**Goal:** be able to derive, code, test, break, and explain the estimators that show up in empirical-economics RA/predoc work.
+The code is educational. It is not a substitute for `fixest`, `did`, `rdrobust`, `ivreg`, or other maintained packages in empirical work.
 
-## Implemented from scratch
+## Implemented
 
 - OLS with classical and HC1 covariance
-- cluster-robust sandwich covariance
-- one-way fixed-effects / within estimator
-- iterative two-way demeaning
-- IV / 2SLS with excluded-instrument first-stage F diagnostic
-- 2x2 difference-in-differences
-- cohort-time staggered DiD comparison logic and event-time aggregation
-- local-linear regression discontinuity with triangular kernel
-- synthetic control via projected-gradient simplex weights
-- propensity-score logistic regression via Newton iterations
-- nearest-neighbor matching with optional caliper
-- randomized experiment difference-in-means
-- permutation/randomization inference
-- linear CATE / treatment-interaction model
+- cluster-robust covariance
+- one-way fixed effects and iterative two-way demeaning
+- IV / 2SLS with a first-stage diagnostic
+- 2×2 difference in differences
+- cohort-time staggered-DiD comparisons and event-time aggregation
+- local-linear regression discontinuity
+- synthetic control with simplex weights
+- propensity-score estimation and nearest-neighbor matching
+- randomized-experiment difference in means and permutation inference
+- a linear treatment-interaction model
 
-The code is intentionally small enough to read. It is **educational**, not a replacement for battle-tested production packages such as `fixest`, `did`, `rdrobust`, `ivreg`, or specialized synthetic-control libraries.
+Each estimator has a synthetic data-generating process with known parameters. The tests ask whether the implementation recovers those parameters or respects an algebraic constraint. That is useful for finding coding mistakes; it does not prove the estimator's assumptions hold in real data.
 
-## Why this is harder than a notebook portfolio
-
-Every estimator has:
-
-1. an implementation;
-2. a synthetic data-generating process with known truth;
-3. a test that must recover that truth;
-4. an assumptions/failure-modes document;
-5. an oral-exam question bank;
-6. timed RA benchmark tasks.
-
-A green test suite therefore means more than “the code ran”: it means the estimator survived a known-truth experiment.
-
-## Quick start
+## Run
 
 ```bash
 python -m venv .venv
@@ -46,10 +30,15 @@ pytest
 python examples/demo.py
 ```
 
-## What to add next
+## Limits I am keeping visible
 
-The next release should add wild-cluster bootstrap, covariate-adjusted doubly robust DiD, honest causal trees/forests, RDD bias correction, weak-IV robust inference, randomization inference under clustered assignment, sensitivity analysis for omitted variables, and simulation notebooks comparing estimators under deliberate assumption failures.
+- The staggered-DiD code demonstrates comparison logic; it does not reproduce every estimator or inference option in maintained packages.
+- The RDD implementation is local-linear and does not include the full bias-corrected inference used by `rdrobust`.
+- The synthetic-control optimizer is intentionally small and is not a general constrained-optimization package.
+- Passing a known-truth simulation says nothing about selection, anticipation, interference, or measurement error in an application.
 
-## Standard for claiming mastery
+More detailed assumptions and failure modes are in [docs/ASSUMPTIONS.md](docs/ASSUMPTIONS.md).
 
-Do not say “I know DiD” because you can call a package. You should be able to explain the estimand, identify the comparison group, code the simplest version from cell means, explain staggered-treatment contamination, diagnose anticipation and pre-trends, select clustering based on assignment, and reproduce the result in a production package.
+## Next experiment
+
+The next useful addition is not another estimator list. It is a simulation that compares nominal and actual rejection rates for cluster-robust inference with few treated clusters, including a wild-cluster bootstrap benchmark.
